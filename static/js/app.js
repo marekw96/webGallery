@@ -55,7 +55,7 @@ var app7 = new Vue({
     },
     fetchDirectory: function(url) {
       this.loading = true
-      axios.get("http://127.0.0.1:5000/getDirContent"+url)
+      axios.get("/getDirContent"+url)
         .then(response => {
           this.error = false;
           this.galleryItemList = response.data;
