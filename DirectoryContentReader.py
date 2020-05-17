@@ -1,5 +1,6 @@
 import os
 from DirectoryEntry import DirectoryEntry
+import urllib.parse
 import json
 
 
@@ -7,6 +8,7 @@ class DirectoryContentReader:
     CONTENT_DIR = "content"
 
     def set_path(self, path):
+        path = urllib.parse.unquote(path)
         self.CONTENT_DIR += "/" + path
 
     def read(self):
@@ -22,10 +24,8 @@ class DirectoryContentReader:
             entry.name = file
 
             if os.path.isfile(file_path):
-                if file_path.endswith(".jpeg") \
-                        or file_path.endswith(".png") \
-                        or file_path.endswith(".jpg") \
-                        or file_path.endswith(".gif"):
+                extension = os.path.splitext(file_path)[1].lower()
+                if extension in ['.jpeg', '.jpg', '.gif', '.png']:
                     entry.type = DirectoryEntry.Type.image
                 else:
                     entry.type = DirectoryEntry.Type.file
