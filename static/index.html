@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="%{{ url_for('static', filename='css/materialize.min.css') }}%"
+          media="screen,projection"
+          rel="stylesheet"
+          type="text/css"/>
+    <link href="%{{ url_for('static', filename='css/lightbox.min.css') }}%"
+          media="screen,projection"
+          rel="stylesheet"
+          type="text/css"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+</head>
+
+<body>
+<nav>
+    <div class="nav-wrapper">
+        <div class="container">
+        <a class="brand-logo" href="#!">webGallery</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div id="app-7">
+        <open-dir-tags style="margin-top: 10px"
+                @go_to_dir="goToDir"
+                v-bind:item="item"
+                v-bind:key="item.id"
+                v-for="item in openDirs"
+        ></open-dir-tags>
+        <section v-if="error">
+            Error happened.
+        </section>
+        <section v-else-if="loading">
+            <div class="progress">
+                <div class="indeterminate"></div>
+            </div>
+        </section>
+        <section v-else>
+            <div class="row">
+                <gallery-card-item
+                        @open_item="openItem"
+                        v-bind:current_dir="currentDir"
+                        v-bind:item="item"
+                        v-bind:key="item.id"
+                        v-for="item in galleryItemList"
+                ></gallery-card-item>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="%{{ url_for('static', filename='js/lightbox-plus-jquery.min.js') }}%" type="text/javascript"></script>
+    <script src="%{{ url_for('static', filename='js/axios.min.js') }}%" type="text/javascript"></script>
+    <script src="%{{ url_for('static', filename='js/vue.min.js') }}%" type="text/javascript"></script>
+    <script src="%{{ url_for('static', filename='js/materialize.min.js') }}%" type="text/javascript"></script>
+    <script src="%{{ url_for('static', filename='js/layout.js') }}%" type="text/javascript"></script>
+    <script src="%{{ url_for('static', filename='js/app.js') }}%" type="text/javascript"></script>
+</body>
+</html>
