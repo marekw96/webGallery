@@ -38,8 +38,9 @@ def get_dir_content(content_path="/"):
     return reader.read_as_json()
 
 
-@app.route("/")
-def start():
+@app.route('/', defaults={'path_to_dir': ''})
+@app.route('/<path:path_to_dir>')
+def start(path_to_dir):
     return render_template('index.html', Config=Config)
 
 
