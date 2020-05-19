@@ -5,8 +5,8 @@ class DirectoryEntry(json.JSONEncoder):
     class Type:
         other = 0
         file = 1
-        directory = 2
-        image = 3
+        image = 2
+        directory = 3  # must be last to make sorting be correct
 
     id = -1
     name = "No name"

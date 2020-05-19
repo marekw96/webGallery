@@ -36,6 +36,8 @@ class DirectoryContentReader:
 
             files.append(entry)
 
+        files.sort(reverse=True, key=lambda item: item.type)
+
         return files
 
     def read_as_json(self):
