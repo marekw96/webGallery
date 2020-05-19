@@ -24,7 +24,7 @@ Vue.component('gallery-card-item', {
 
 Vue.component('open-dir-tags', {
     props: ['item'],
-    template: '<div class="chip" v-on:click="$emit(\'go_to_dir\', item.id )">{{ item.name }}</div>'
+    template: '<a class="breadcrumb" v-on:click="$emit(\'go_to_dir\', item.id )">{{ item.name }}</a>'
 })
 
 let addToHistory = true;

@@ -20,7 +20,7 @@
 </head>
 
 <body>
-<nav>
+<nav id="no-style-nav">
     <div class="nav-wrapper">
         <div class="container">
             <a class="brand-logo" href="#!">webGallery</a>
@@ -30,12 +30,19 @@
 
 <div class="container">
     <div id="app">
-        <open-dir-tags @go_to_dir="goToDir"
-                       style="margin-top: 10px"
-                       v-bind:item="item"
-                       v-bind:key="item.id"
-                       v-for="item in openDirs"
-        ></open-dir-tags>
+        <nav>
+            <div class="nav-wrapper breadcrumbs">
+                <div class="col s12">
+                    <open-dir-tags @go_to_dir="goToDir"
+                                   style="margin-top: 10px"
+                                   v-bind:item="item"
+                                   v-bind:key="item.id"
+                                   v-for="item in openDirs"
+                    ></open-dir-tags>
+                </div>
+            </div>
+        </nav>
+
         <section v-if="error">
             Error happened.
         </section>

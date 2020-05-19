@@ -37,3 +37,21 @@
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
+
+.card {
+    min-height: 140px;
+    min-width: 130px;
+}
+
+#no-style-nav {
+    background-color: #fff;
+    color: #000;
+}
+#no-style-nav .brand-logo {
+    color: #000 !important;
+}
+
+.breadcrumbs {
+    padding-left: 12px;
+    margin-top: 8px;
+}
