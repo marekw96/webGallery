@@ -11,6 +11,7 @@ Vue.component('gallery-card-item', {
         '       <img v-else src="static/images/file.png"/>' +
         '     </div>' +
         '     <div class="card-action" v-if="item.type == \'image\'"><a :href="\'getFile/\' + current_dir + item.name" data-lightbox="roadtrip">{{ item.name }}</a></div>' +
+        '     <div class="card-action" v-else-if="item.type == \'file\'"><a :href="\'getFile/\' + current_dir + item.name+\'?download\'">{{ item.name }}</a></div>' +
         '     <div class="card-action" v-else>{{ item.name }}</div>' +
         '   </div>' +
         '</div>'
@@ -35,7 +36,7 @@ var app7 = new Vue({
     methods: {
         generatePathToIndex: function (index) {
             let current = "";
-            for (let i = 0; i < index; ++i) {
+            for (let i = 0; i < index && i < this.openDirs.length; ++i) {
                 current += this.openDirs[i].name;
                 if (current[current.length - 1] !== '/')
                     current += "/"
@@ -60,8 +61,10 @@ var app7 = new Vue({
             }
         },
         goToDir: function (index) {
-            this.fetchDirectory(this.generatePathToIndex(index + 1));
+            let dir = this.generatePathToIndex(index + 1);
+            this.fetchDirectory(dir);
             this.openDirs.splice(index + 1, this.openDirs.length);
+            this.updatePath(dir);
         },
         fetchDirectory: function (url) {
             if (addToHistory)
@@ -82,10 +85,13 @@ var app7 = new Vue({
                 .finally(() => this.loading = false)
         },
         updatePath: function (dir) {
-            this.openDirs.push({id: this.openDirs.length, name: "/"});
+            this.openDirs.push({id: 0, name: "/"});
 
-            if (dir === "/")
+            if (dir === "/") {
+                this.openDirs = [{id: 0, name: "/"}];
+                this.currentDir = "/"
                 return;
+            }
 
             let dirs = dir.split("/");
             dirs.shift();
