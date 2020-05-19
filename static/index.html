@@ -2,6 +2,10 @@
 <html>
 <head>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="%{{ url_for('static', filename='css/app.css') }}%"
+          media="screen,projection"
+          rel="stylesheet"
+          type="text/css"/>
     <link href="%{{ url_for('static', filename='css/materialize.min.css') }}%"
           media="screen,projection"
           rel="stylesheet"
@@ -11,6 +15,7 @@
           rel="stylesheet"
           type="text/css"/>
 
+
     <!--Let browser know website is optimized for mobile-->
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 </head>
@@ -19,18 +24,18 @@
 <nav>
     <div class="nav-wrapper">
         <div class="container">
-        <a class="brand-logo" href="#!">webGallery</a>
+            <a class="brand-logo" href="#!">webGallery</a>
         </div>
     </div>
 </nav>
 
 <div class="container">
     <div id="app-7">
-        <open-dir-tags style="margin-top: 10px"
-                @go_to_dir="goToDir"
-                v-bind:item="item"
-                v-bind:key="item.id"
-                v-for="item in openDirs"
+        <open-dir-tags @go_to_dir="goToDir"
+                       style="margin-top: 10px"
+                       v-bind:item="item"
+                       v-bind:key="item.id"
+                       v-for="item in openDirs"
         ></open-dir-tags>
         <section v-if="error">
             Error happened.

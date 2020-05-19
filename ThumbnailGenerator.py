@@ -6,7 +6,7 @@ import urllib.parse
 
 class ThumbnailGenerator:
     CONTENT_DIR = "content"
-    MAX_SIZE = 256
+    MAX_SIZE = 220
 
     def make_to_io(self, path_to_file):
         path_to_file = urllib.parse.unquote(path_to_file)
