@@ -35,7 +35,8 @@ var app = new Vue({
         loading: true,
         galleryItemList: [],
         openDirs: [],
-        currentDir: "/"
+        currentDir: "/",
+        pageTitle: "webGallery"
     },
     methods: {
         generatePathToIndex: function (index) {
@@ -84,6 +85,7 @@ var app = new Vue({
                 .then(response => {
                     this.error = false;
                     this.galleryItemList = response.data;
+                    document.title = this.pageTitle + " - " + this.openDirs[this.openDirs.length-1].name;
                 })
                 .catch(error => {
                     console.log(error);
@@ -115,6 +117,7 @@ var app = new Vue({
         }
     },
     mounted() {
+        this.pageTitle = document.title;
         this.atStart()
     }
 })
