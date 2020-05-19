@@ -1,5 +1,7 @@
 var PAGE_ADDRESS = "http://0.0.0.0:5000"
 
+Vue.use(VueLazyload)
+
 Vue.component('gallery-card-item', {
     props: ['item', 'current_dir'],
     template:
@@ -7,7 +9,7 @@ Vue.component('gallery-card-item', {
         '   <div class="card" v-on:click="$emit(\'open_item\', item)">' +
         '     <div class="card-image">' +
         '       <img v-if="item.type == \'directory\'" src="static/images/directory.png"/>' +
-        '       <img v-else-if="item.type == \'image\'" :src="\'getThumbnail/\' + current_dir + item.name" width="125px" height="125px"/>' +
+        '       <img v-else-if="item.type == \'image\'" v-lazy="\'getThumbnail/\' + current_dir + item.name" width="125px" height="125px"/>' +
         '       <img v-else src="static/images/file.png"/>' +
         '     </div>' +
         '     <div class="card-action" v-if="item.type == \'image\'"><a :href="\'getFile/\' + current_dir + item.name" data-lightbox="roadtrip">{{ item.name.substr(0,13) }}</a></div>' +
