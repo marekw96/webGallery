@@ -8,7 +8,7 @@ Vue.component('gallery-card-item', {
     props: ['item', 'current_dir'],
     template:
         '<div class="col s6 m4 l2">' +
-        '   <div class="card" v-on:click="$emit(\'open_item\', item)">' +
+        '   <div class="card tooltip" v-on:click="$emit(\'open_item\', item)">' +
         '     <div class="card-image">' +
         '       <img v-if="item.type == \'directory\'" src="static/images/directory.png"/>' +
         '       <img v-else-if="item.type == \'image\'" v-lazy="\'getThumbnail/\' + current_dir + item.name" width="125px" height="125px"/>' +
@@ -17,6 +17,7 @@ Vue.component('gallery-card-item', {
         '     <div class="card-action" v-if="item.type == \'image\'"><a :href="\'getFile/\' + current_dir + item.name" data-lightbox="roadtrip">{{ item.name.substr(0,13) }}</a></div>' +
         '     <div class="card-action" v-else-if="item.type == \'file\'"><a :href="\'getFile/\' + current_dir + item.name+\'?download\'">{{ item.name.substr(0,10) }}</a></div>' +
         '     <div class="card-action" v-else>{{ item.name.substr(0,10) }}</div>' +
+        '     <span class="tooltiptext">{{ item.name }}</span>' +
         '   </div>' +
         '</div>'
 })
