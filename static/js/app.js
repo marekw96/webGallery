@@ -1,4 +1,6 @@
-var PAGE_ADDRESS = "http://0.0.0.0:5000"
+var PAGE_ADDRESS = "" + window.location.protocol
+    + "//" + window.location.hostname
+    + (window.location.port === 80 ? "" : ":" + window.location.port);
 
 Vue.use(VueLazyload)
 
@@ -26,8 +28,8 @@ Vue.component('open-dir-tags', {
 
 let addToHistory = true;
 
-var app7 = new Vue({
-    el: '#app-7',
+var app = new Vue({
+    el: '#app',
     data: {
         error: false,
         loading: true,
@@ -43,7 +45,7 @@ var app7 = new Vue({
                 if (current[current.length - 1] !== '/')
                     current += "/";
             }
-            if (current[current.length-1] === '/')
+            if (current[current.length - 1] === '/')
                 current = current.slice(0, -1);
 
             return current;
@@ -119,5 +121,5 @@ var app7 = new Vue({
 
 window.onpopstate = () => {
     addToHistory = false;
-    app7.atStart();
+    app.atStart();
 }
