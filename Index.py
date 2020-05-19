@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_file, request
 from DirectoryContentReader import DirectoryContentReader
 from ThumbnailGenerator import ThumbnailGenerator
 from FileReader import FileReader
@@ -26,6 +26,10 @@ def get_thumbnail(path_to_file):
 @app.route("/getFile/<path:path_to_file>")
 def get_file(path_to_file):
     file_reader = FileReader()
+
+    if request.args.get('download'):
+        file_reader.as_download = True
+
     return file_reader.read_file(path_to_file)
 
 
