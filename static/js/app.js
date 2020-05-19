@@ -39,8 +39,11 @@ var app7 = new Vue({
             for (let i = 0; i < index && i < this.openDirs.length; ++i) {
                 current += this.openDirs[i].name;
                 if (current[current.length - 1] !== '/')
-                    current += "/"
+                    current += "/";
             }
+            if (current[current.length-1] === '/')
+                current = current.slice(0, -1);
+
             return current;
         },
         addToCurrentPath: function (dir) {
@@ -63,7 +66,7 @@ var app7 = new Vue({
         goToDir: function (index) {
             let dir = this.generatePathToIndex(index + 1);
             this.fetchDirectory(dir);
-            this.openDirs.splice(index + 1, this.openDirs.length);
+            this.openDirs = [];
             this.updatePath(dir);
         },
         fetchDirectory: function (url) {

@@ -49,7 +49,7 @@
             <div class="row">
                 <gallery-card-item
                         @open_item="openItem"
-                        v-bind:current_dir="currentDir"
+                        v-bind:current_dir="currentDir +'\\'"
                         v-bind:item="item"
                         v-bind:key="item.id"
                         v-for="item in galleryItemList"
