@@ -55,3 +55,8 @@
     padding-left: 12px;
     margin-top: 8px;
 }
+
+#search-bar, #search-bar .row {
+    margin: 0 !important;
+    padding: 0 !important;
+}

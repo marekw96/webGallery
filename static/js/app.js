@@ -1,6 +1,6 @@
 var PAGE_ADDRESS = "" + window.location.protocol
     + "//" + window.location.hostname
-    + (window.location.port? ":" + window.location.port : "");
+    + (window.location.port ? ":" + window.location.port : "");
 
 Vue.use(VueLazyload)
 
@@ -37,7 +37,21 @@ var app = new Vue({
         galleryItemList: [],
         openDirs: [],
         currentDir: "/",
-        pageTitle: "webGallery"
+        pageTitle: "webGallery",
+        filterValue: ""
+    },
+    computed: {
+        filteredData() {
+            var self = this;
+
+            if (this.filterValue !== undefined && this.filterValue !== '') {
+                return this.galleryItemList.filter(function (d) {
+                    return d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
+                });
+            } else {
+                return this.galleryItemList;
+            }
+        }
     },
     methods: {
         generatePathToIndex: function (index) {
@@ -86,7 +100,7 @@ var app = new Vue({
                 .then(response => {
                     this.error = false;
                     this.galleryItemList = response.data;
-                    document.title = this.pageTitle + " - " + this.openDirs[this.openDirs.length-1].name;
+                    document.title = this.pageTitle + " - " + this.openDirs[this.openDirs.length - 1].name;
                 })
                 .catch(error => {
                     console.log(error);
