@@ -39,6 +39,10 @@ def get_file(path_to_file):
 def get_dir_content(content_path="/"):
     reader = DirectoryContentReader()
     reader.set_path(content_path)
+
+    if request.args.get('flat'):
+        reader.read_as_flat = True
+
     return reader.read_as_json()
 
 

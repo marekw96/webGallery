@@ -129,6 +129,10 @@ var app = new Vue({
             let start_dir = ("" + document.location).slice(PAGE_ADDRESS.length + 2);
             this.fetchDirectory(start_dir);
             this.updatePath(start_dir);
+        },
+        flatView: function() {
+            addToHistory = false
+            this.fetchDirectory(this.generatePathToCurrent() + "?flat=yes");
         }
     },
     mounted() {
