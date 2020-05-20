@@ -1,6 +1,6 @@
 var PAGE_ADDRESS = "" + window.location.protocol
     + "//" + window.location.hostname
-    + (window.location.port === 80 ? "" : ":" + window.location.port);
+    + (window.location.port? ":" + window.location.port : "");
 
 Vue.use(VueLazyload)
 
