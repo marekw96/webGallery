@@ -20,7 +20,7 @@ app = CustomFlask(__name__, template_folder="static/")
 @app.route("/getThumbnail/<path:path_to_file>")
 def get_thumbnail(path_to_file):
     thumbnail_generator = ThumbnailGenerator()
-    return send_file(thumbnail_generator.make_to_io(path_to_file), mimetype="image/jpeg")
+    return thumbnail_generator.make_thumbnail(path_to_file)
 
 
 @app.route("/getFile/<path:path_to_file>")
