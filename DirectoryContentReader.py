@@ -15,7 +15,6 @@ class DirectoryContentReader:
     def get_type(self, file_path):
         if os.path.isfile(file_path):
             extension = os.path.splitext(file_path)[1].lower()
-            print(extension)
             if extension in ['.jpeg', '.jpg', '.gif', '.png']:
                 return DirectoryEntry.Type.image
             else:
