@@ -7,7 +7,7 @@ from flask import send_file
 
 class ThumbnailGenerator:
     CONTENT_DIR = "content"
-    MAX_SIZE = 256
+    MAX_SIZE = 140
 
     def make_to_io(self, path_to_file, format):
         image = Image.open(os.path.join(self.CONTENT_DIR, path_to_file))
