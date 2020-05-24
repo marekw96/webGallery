@@ -5,12 +5,16 @@ import json
 
 
 class DirectoryContentReader:
-    CONTENT_DIR = "content"
-    read_as_flat = False
+    def __init__(self):
+        self.CONTENT_DIR = "content"
+        self.read_as_flat = False
 
     def set_path(self, path):
         path = urllib.parse.unquote(path)
         self.CONTENT_DIR += "/" + path
+
+    def set_flat_read(self, is_flat):
+        self.read_as_flat = is_flat
 
     def get_type(self, file_path):
         if os.path.isfile(file_path):
@@ -66,8 +70,11 @@ class DirectoryContentReader:
 
         return files_out
 
-    def read_as_json(self):
+    def read_entries(self):
         if self.read_as_flat:
-            return json.dumps(self.read_flat(), cls=DirectoryEntry)
+            return self.read_flat()
         else:
-            return json.dumps(self.read(), cls=DirectoryEntry)
+            return self.read()
+
+    def read_as_json(self):
+        return json.dumps(self.read_entries(), cls=DirectoryEntry)

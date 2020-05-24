@@ -2,6 +2,7 @@ from flask import Flask, render_template, send_file, request
 from DirectoryContentReader import DirectoryContentReader
 from ThumbnailGenerator import ThumbnailGenerator
 from FileReader import FileReader
+from ZipGenerator import ZipGenerator
 
 Config = {"resource": "static/"}
 
@@ -41,9 +42,22 @@ def get_dir_content(content_path="/"):
     reader.set_path(content_path)
 
     if request.args.get('flat'):
-        reader.read_as_flat = True
+        reader.set_flat_read(True)
 
     return reader.read_as_json()
+
+
+@app.route("/zipDir")
+@app.route("/zipDir/")
+@app.route("/zipDir/<path:content_path>")
+def zip_dir(content_path="/"):
+    zip_gen = ZipGenerator()
+    zip_gen.set_path(content_path)
+
+    if request.args.get('flat'):
+        zip_gen.set_flat_read(True)
+
+    return zip_gen.return_zip()
 
 
 @app.route('/', defaults={'path_to_dir': ''})

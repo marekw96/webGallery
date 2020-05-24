@@ -38,7 +38,8 @@ var app = new Vue({
         openDirs: [],
         currentDir: "/",
         pageTitle: "webGallery",
-        filterValue: ""
+        filterValue: "",
+        isFlatView: false
     },
     computed: {
         filteredData() {
@@ -95,6 +96,7 @@ var app = new Vue({
             else
                 addToHistory = true;
 
+            this.isFlatView = url.endsWith("?flat=yes");
             this.loading = true
             axios.get("/getDirContent" + url)
                 .then(response => {
@@ -133,6 +135,10 @@ var app = new Vue({
         flatView: function() {
             addToHistory = false
             this.fetchDirectory(this.generatePathToCurrent() + "?flat=yes");
+        },
+        dirView: function() {
+            addToHistory = false
+            this.fetchDirectory(this.generatePathToCurrent());
         }
     },
     mounted() {

@@ -47,10 +47,25 @@
 
             <div class="col s12">
                 <div class="row">
-                    <div class="col s12 l2 input-field">
-                        <a class="waves-effect waves-light btn" v-on:click="flatView"><i class="material-icons left">visibility</i>flat view</a>
+                    <div class="col s6 l2 input-field" v-if="!isFlatView">
+                        <a class="waves-effect waves-light btn" v-on:click="flatView">
+                            <i class="material-icons left">visibility</i>
+                            flat view
+                        </a>
                     </div>
-                    <div class="input-field col s12 l10">
+                    <div class="col s6 l2 input-field" v-if="isFlatView">
+                        <a class="waves-effect waves-light btn" v-on:click="dirView">
+                            <i class="material-icons left">folder</i>
+                            dir view
+                        </a>
+                    </div>
+                    <div class="col s6 l3 input-field">
+                        <a class="waves-effect waves-light btn" :href="'zipDir/' + currentDir + (isFlatView?'?flat=yes':'')">
+                            <i class="material-icons left">file_download</i>
+                            download
+                        </a>
+                    </div>
+                    <div class="input-field col s12 l7">
                         <i class="material-icons prefix">search</i>
                         <input type="text" id="search-input" class="search" v-model="filterValue">
                         <label for="search-input">Search</label>
