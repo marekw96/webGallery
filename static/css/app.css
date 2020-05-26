@@ -60,3 +60,10 @@
     margin: 0 !important;
     padding: 0 !important;
 }
+#search-bar .col {
+    padding: 0 !important;
+}
+
+.download-button a {
+    padding: 0 13px !important;
+}
