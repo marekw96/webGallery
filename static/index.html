@@ -60,7 +60,7 @@
                         </a>
                     </div>
                     <div class="col s6 l3 input-field">
-                        <a class="waves-effect waves-light btn" :href="'zipDir/' + currentDir + (isFlatView?'?flat=yes':'')">
+                        <a class="waves-effect waves-light btn" :href="pageAddress + '/zipDir/' + currentDir + (isFlatView?'?flat=yes':'')">
                             <i class="material-icons left">file_download</i>
                             download
                         </a>
@@ -89,6 +89,7 @@
                         v-bind:current_dir="currentDir +'\\'"
                         v-bind:item="item"
                         v-bind:key="item.id"
+                        v-bind:page_address="pageAddress"
                         v-for="item in filteredData"
                 ></gallery-card-item>
             </div>

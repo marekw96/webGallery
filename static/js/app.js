@@ -1,21 +1,22 @@
 var PAGE_ADDRESS = "" + window.location.protocol
     + "//" + window.location.hostname
-    + (window.location.port ? ":" + window.location.port : "");
+    + (window.location.port ? ":" + window.location.port : "")
+    + "/";
 
 Vue.use(VueLazyload)
 
 Vue.component('gallery-card-item', {
-    props: ['item', 'current_dir'],
+    props: ['item', 'current_dir', 'page_address'],
     template:
         '<div class="col s6 m4 l2">' +
         '   <div class="card tooltip" v-on:click="$emit(\'open_item\', item)">' +
         '     <div class="card-image">' +
-        '       <img v-if="item.type == \'directory\'" src="static/images/directory.png"/>' +
-        '       <img v-else-if="item.type == \'image\'" v-lazy="\'getThumbnail/\' + current_dir + item.name"/>' +
-        '       <img v-else src="static/images/file.png"/>' +
+        '       <img v-if="item.type == \'directory\'" :src="page_address + \'static/images/directory.png\'"/>' +
+        '       <img v-else-if="item.type == \'image\'" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>' +
+        '       <img v-else :src="page_address + \'static/images/file.png\'"/>' +
         '     </div>' +
-        '     <div class="card-action" v-if="item.type == \'image\'"><a :href="\'getFile/\' + current_dir + item.name" data-lightbox="roadtrip">{{ item.name.substr(0,13) }}</a></div>' +
-        '     <div class="card-action" v-else-if="item.type == \'file\'"><a :href="\'getFile/\' + current_dir + item.name+\'?download\'">{{ item.name.substr(0,10) }}</a></div>' +
+        '     <div class="card-action" v-if="item.type == \'image\'"><a :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">{{ item.name.substr(0,13) }}</a></div>' +
+        '     <div class="card-action" v-else-if="item.type == \'file\'"><a :href="page_address + \'getFile\' + current_dir + item.name+\'?download\'" target="_blank">{{ item.name.substr(0,10) }}</a></div>' +
         '     <div class="card-action" v-else>{{ item.name.substr(0,10) }}</div>' +
         '     <span class="tooltiptext">{{ item.name }}</span>' +
         '   </div>' +
@@ -39,7 +40,8 @@ var app = new Vue({
         currentDir: "/",
         pageTitle: "webGallery",
         filterValue: "",
-        isFlatView: false
+        isFlatView: false,
+        pageAddress: PAGE_ADDRESS
     },
     computed: {
         filteredData() {
@@ -92,13 +94,13 @@ var app = new Vue({
         },
         fetchDirectory: function (url) {
             if (addToHistory)
-                history.pushState({}, url, "?" + url);
+                history.pushState({},  url.substr(1), this.pageAddress + url.substr(1));
             else
                 addToHistory = true;
 
             this.isFlatView = url.endsWith("?flat=yes");
             this.loading = true
-            axios.get("/getDirContent" + url)
+            axios.get(this.pageAddress + "getDirContent" + url)
                 .then(response => {
                     this.error = false;
                     this.galleryItemList = response.data;
@@ -111,16 +113,17 @@ var app = new Vue({
                 .finally(() => this.loading = false)
         },
         updatePath: function (dir) {
-            this.openDirs.push({id: 0, name: "/"});
+            this.openDirs = [{id: 0, name: "/"}];
 
             if (dir === "/") {
-                this.openDirs = [{id: 0, name: "/"}];
                 this.currentDir = "/"
                 return;
             }
 
             let dirs = dir.split("/");
-            dirs.shift();
+            if(dirs[0].length === 0)
+                dirs.shift();
+
             for (let dir of dirs)
                 this.openDirs.push({id: this.openDirs.length, name: decodeURIComponent(dir)});
 
@@ -128,7 +131,7 @@ var app = new Vue({
         },
         atStart: function (dir) {
             this.openDirs = [];
-            let start_dir = ("" + document.location).slice(PAGE_ADDRESS.length + 2);
+            let start_dir = ("" + document.location).slice(this.pageAddress.length - 1);
             this.fetchDirectory(start_dir);
             this.updatePath(start_dir);
         },
