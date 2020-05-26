@@ -16,7 +16,7 @@ Vue.component('gallery-card-item', {
         '       <img v-else :src="page_address + \'static/images/file.png\'"/>' +
         '     </div>' +
         '     <div class="card-action" v-if="item.type == \'image\'"><a :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">{{ item.name.substr(0,13) }}</a></div>' +
-        '     <div class="card-action" v-else-if="item.type == \'file\'"><a :href="page_address + \'getFile\' + current_dir + item.name+\'?download\'" target="_blank">{{ item.name.substr(0,10) }}</a></div>' +
+        '     <div class="card-action" v-else-if="item.type == \'file\'"><a :href="page_address + \'getFile\' + current_dir + item.name+\'?download=yes\'" target="_blank">{{ item.name.substr(0,10) }}</a></div>' +
         '     <div class="card-action" v-else>{{ item.name.substr(0,10) }}</div>' +
         '     <span class="tooltiptext">{{ item.name }}</span>' +
         '   </div>' +
