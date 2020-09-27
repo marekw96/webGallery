@@ -67,3 +67,7 @@
 .download-button a {
     padding: 0 13px !important;
 }
+
+.card a {
+    color: #ffab40 !important;
+}

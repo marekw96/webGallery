@@ -10,15 +10,27 @@ Vue.component('gallery-card-item', {
     template:
         '<div class="col s6 m4 l2">' +
         '   <div class="card tooltip" v-on:click="$emit(\'open_item\', item)">' +
-        '     <div class="card-image">' +
-        '       <img v-if="item.type == \'directory\'" :src="page_address + \'static/images/directory.png\'"/>' +
-        '       <img v-else-if="item.type == \'image\'" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>' +
-        '       <img v-else :src="page_address + \'static/images/file.png\'"/>' +
-        '     </div>' +
-        '     <div class="card-action" v-if="item.type == \'image\'"><a :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">{{ item.name.substr(0,13) }}</a></div>' +
-        '     <div class="card-action" v-else-if="item.type == \'file\'"><a :href="page_address + \'getFile\' + current_dir + item.name+\'?download=yes\'" target="_blank">{{ item.name.substr(0,10) }}</a></div>' +
-        '     <div class="card-action" v-else>{{ item.name.substr(0,10) }}</div>' +
-        '     <span class="tooltiptext">{{ item.name }}</span>' +
+        '     <a v-if="item.type == \'directory\'">' +
+        '       <div class="card-image">' +
+        '           <img :src="page_address + \'static/images/directory.png\'"/>' +
+        '       </div>' +
+        '       <div class="card-action">{{ item.name.substr(0,10) }}</div>' +
+        '       <span class="tooltiptext">{{ item.name }}</span>' +
+        '     </a>' +
+        '     <a v-else-if="item.type == \'image\'" :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">' +
+        '       <div class="card-image">' +
+        '           <img v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>' +
+        '       </div>' +
+        '       <div class="card-action">{{ item.name.substr(0,10) }}</div>' +
+        '       <span class="tooltiptext">{{ item.name }}</span>' +
+        '     </a>' +
+        '     <a v-else :href="page_address + \'getFile\' + current_dir + item.name+\'?download=yes\'" target="_blank">' +
+        '       <div class="card-image">' +
+        '           <img :src="page_address + \'static/images/file.png\'"/>' +
+        '       </div>' +
+        '       <div class="card-action">{{ item.name.substr(0,10) }}</div>' +
+        '       <span class="tooltiptext">{{ item.name }}</span>' +
+        '     </a>' +
         '   </div>' +
         '</div>'
 })
