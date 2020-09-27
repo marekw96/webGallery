@@ -2,6 +2,7 @@ import os
 from DirectoryEntry import DirectoryEntry
 import urllib.parse
 import json
+import operator
 
 
 class DirectoryContentReader:
@@ -43,7 +44,7 @@ class DirectoryContentReader:
 
             files.append(entry)
 
-        files.sort(reverse=True, key=lambda item: item.type)
+        files.sort(key=lambda item: (item.type != DirectoryEntry.Type.directory, item.name))
 
         return files
 
@@ -67,6 +68,8 @@ class DirectoryContentReader:
                 entry.type = self.get_type(file_path)
 
                 files_out.append(entry)
+
+        files_out.sort(key=lambda item: item.name)
 
         return files_out
 
