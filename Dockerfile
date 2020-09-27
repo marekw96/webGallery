@@ -4,7 +4,7 @@ MAINTAINER marekw96
 
 RUN apk add --no-cache bash git python3 py3-pip zlib-dev libjpeg python3-dev jpeg-dev gcc && \
     apk add --no-cache --virtual .build-deps build-base linux-headers && \
-    pip3 install virtualenv && \
+    pip3 install --ignore-installed distlib pipenv && \
     git clone https://github.com/marekw96/webGallery && \
     cd webGallery &&\
     python3 -m venv venv && \
