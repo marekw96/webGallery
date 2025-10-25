@@ -11,7 +11,7 @@ class ThumbnailGenerator:
 
     def make_to_io(self, path_to_file, format):
         image = Image.open(os.path.join(self.CONTENT_DIR, path_to_file))
-        image = image.resize((self.MAX_SIZE, self.MAX_SIZE), Image.ANTIALIAS)
+        image = image.resize((self.MAX_SIZE, self.MAX_SIZE))
 
         img_io = BytesIO()
         image.save(img_io, format, quality=70)
