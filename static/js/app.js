@@ -58,7 +58,22 @@ var app = new Vue({
                     return d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
                 });
             } else {
-                return this.galleryItemList;
+                return this.galleryItemList.filter(function (d) {
+                    return d.type != "image";
+                });
+            }
+        },
+        filteredImages() {
+            var self = this;
+
+            if (this.filterValue !== undefined && this.filterValue !== '') {
+                return this.galleryItemList.filter(function (d) {
+                    return d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
+                });
+            } else {
+                return this.galleryItemList.filter(function (d) {
+                    return d.type == "image";
+                });
             }
         }
     },
