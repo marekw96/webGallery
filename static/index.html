@@ -58,7 +58,7 @@
                         </a>
                     </div>
                     <div class="input-field col s12 l7">
-                        <i class="material-icons prefix">search</i>
+                        <i class="material-icons prefix" style="color: #FFE1AF">search</i>
                         <input type="text" id="search-input" class="search" v-model="filterValue">
                         <label for="search-input">Search</label>
                     </div>
@@ -76,14 +76,24 @@
         </section>
         <section v-else>
             <div class="row">
-                <gallery-card-item
+                <gallery-card-item-folder
                         @open_item="openItem"
                         v-bind:current_dir="currentDir +'\\'"
                         v-bind:item="item"
                         v-bind:key="item.id"
                         v-bind:page_address="pageAddress"
                         v-for="item in filteredData"
-                ></gallery-card-item>
+                ></gallery-card-item-folder>
+            </div>
+            <div class="row">
+                <gallery-card-item-image
+                        @open_item="openItem"
+                        v-bind:current_dir="currentDir +'\\'"
+                        v-bind:item="item"
+                        v-bind:key="item.id"
+                        v-bind:page_address="pageAddress"
+                        v-for="item in filteredData"
+                ></gallery-card-item-image>
             </div>
         </section>
 

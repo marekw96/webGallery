@@ -1,5 +1,30 @@
+body {
+    background-color: #957C62;
+}
+
+.card-image {
+    background-color: #957C62;
+}
+
+nav, .btn{
+    background-color: #B77466 !important;
+}
+
 .card-action {
     padding: 5px 5px !important;
+}
+
+.folder {
+    width: 100%;
+}
+
+.row {
+    padding: 0 !important;
+}
+
+.image_thumbnail {
+    width: 100%;
+    height: 100%;
 }
 
 /* Tooltip container */

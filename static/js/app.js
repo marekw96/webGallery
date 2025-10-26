@@ -5,33 +5,27 @@ var PAGE_ADDRESS = "" + window.location.protocol
 
 Vue.use(VueLazyload)
 
-Vue.component('gallery-card-item', {
+Vue.component('gallery-card-item-folder', {
     props: ['item', 'current_dir', 'page_address'],
     template:
-        '<div class="col s6 m4 l2">' +
-        '   <div class="card tooltip" v-on:click="$emit(\'open_item\', item)">' +
-        '     <a v-if="item.type == \'directory\'">' +
-        '       <div class="card-image">' +
-        '           <img :src="page_address + \'static/images/directory.png\'"/>' +
-        '       </div>' +
-        '       <div class="card-action">{{ item.name.substr(0,10) }}</div>' +
-        '       <span class="tooltiptext">{{ item.name }}</span>' +
-        '     </a>' +
-        '     <a v-else-if="item.type == \'image\'" :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">' +
-        '       <div class="card-image">' +
-        '           <img v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>' +
-        '       </div>' +
-        '       <div class="card-action">{{ item.name.substr(0,10) }}</div>' +
-        '       <span class="tooltiptext">{{ item.name }}</span>' +
-        '     </a>' +
-        '     <a v-else :href="page_address + \'getFile\' + current_dir + item.name+\'?download=yes\'" target="_blank">' +
-        '       <div class="card-image">' +
-        '           <img :src="page_address + \'static/images/file.png\'"/>' +
-        '       </div>' +
-        '       <div class="card-action">{{ item.name.substr(0,10) }}</div>' +
-        '       <span class="tooltiptext">{{ item.name }}</span>' +
-        '     </a>' +
-        '   </div>' +
+        '<div class="col s6 m6 l4" v-if="item.type == \'directory\'" v-on:click="$emit(\'open_item\', item)">' +
+        '   <a class="waves-effect waves-light btn folder"><i class="material-icons left">folder</i> {{ item.name }}</a>'+
+        '</div>'+
+        '<div class="col s6 m6 l4" v-else-if="item.type == \'file\'">' +
+        '   <a class="waves-effect waves-light btn folder" :href="page_address + \'getFile\' + current_dir + item.name+\'?download=yes\'" target="_blank"><i class="material-icons left">attach_file</i> {{ item.name }}</a>'+
+        '</div>' +
+        '<div class="col s6 m6 l4" v-else-if="item.type == \'other\'">' +
+        '   <a class="waves-effect waves-light btn folder" :href="page_address + \'getFile\' + current_dir + item.name+\'?download=yes\'" target="_blank"><i class="material-icons left">broken_image</i> {{ item.name }}</a>'+
+        '</div>'
+})
+
+Vue.component('gallery-card-item-image', {
+    props: ['item', 'current_dir', 'page_address'],
+    template:
+        '<div class="col s6 m4 l2" v-if="item.type == \'image\'" v-on:click="$emit(\'open_item\', item)">' +
+        '   <a :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">' +
+        '       <img v-lazy="page_address + \'getThumbnail\' + current_dir + item.name" class="image_thumbnail"/>'+
+        '   </a>' +
         '</div>'
 })
 
