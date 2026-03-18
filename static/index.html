@@ -1,104 +1,107 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
+
 <head>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="%{{ url_for('static', filename='css/app.css') }}%"
-          media="screen,projection"
-          rel="stylesheet"
-          type="text/css"/>
-    <link href="%{{ url_for('static', filename='css/materialize.min.css') }}%"
-          media="screen,projection"
-          rel="stylesheet"
-          type="text/css"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>DataStore - File Gallery</title>
+    <!-- Tailwind CSS v3 with plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- lightbox -->
     <link href="%{{ url_for('static', filename='css/lightbox.min.css') }}%"
           media="screen,projection"
           rel="stylesheet"
           type="text/css"/>
-    <title>webGallery</title>
-    <!--Let browser know website is optimized for mobile-->
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+    <style data-purpose="typography">
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+    <style data-purpose="layout">
+        /* Subtle hover effect for file cards */
+        .file-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .file-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        }
+    </style>
 </head>
 
-<body>
-<div class="container">
-    <div id="app">
-        <nav>
-            <div class="nav-wrapper breadcrumbs">
-                <div class="col s12">
-                    <open-dir-tags @go_to_dir="goToDir"
-                                   style="margin-top: 10px"
-                                   v-bind:item="item"
-                                   v-bind:key="item.id"
-                                   v-for="item in openDirs"
-                    ></open-dir-tags>
+<body class="bg-[#0f1414] text-slate-200 min-h-screen flex flex-col">
+    <span id="app">
+        <!-- BEGIN: MainHeader -->
+        <header class="bg-[#1a2121] border-b border-[#2a3535] sticky top-0 z-10" data-purpose="main-navigation">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between py-4 gap-4">
+                    <!-- BEGIN: Breadcrumbs -->
+                    <nav aria-label="Breadcrumb" class="flex items-center text-sm font-medium text-slate-400">
+                        <ol class="flex items-center space-x-2">
+                            <open-dir-tags @go_to_dir="goToDir" style="margin-top: 10px" v-bind:item="item"
+                                v-bind:key="item.id" v-for="item in openDirs"></open-dir-tags>
+                        </ol>
+                    </nav>
+                    <!-- END: Breadcrumbs -->
+                    <!-- BEGIN: ActionBar -->
+                    <div class="flex items-center space-x-4" data-purpose="action-controls">
+                        <div class="flex items-center mr-2">
+                            <label class="inline-flex items-center cursor-pointer" v-on:click="toggleView">
+                                <span class="mr-2 text-sm text-slate-400">Show All Images</span>
+                                <input class="sr-only peer" type="checkbox" value="" />
+                                <div
+                                    class="relative w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-900/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600">
+                                </div>
+                            </label>
+                        </div>
+                        <button v-on:click="window.open(pageAddress + '/zipDir/' + currentDir + (isFlatView?'?flat=yes':''), '_blank')"
+                            class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
+                            type="button">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                            </svg>
+                            Download Directory
+                        </button>
+                    </div>
+                    <!-- END: ActionBar -->
                 </div>
             </div>
-        </nav>
-
-        <div class="row" id="search-bar">
-
-            <div class="col s12">
-                <div class="row">
-                    <div class="col s6 l2 input-field" v-if="!isFlatView">
-                        <a class="waves-effect waves-light btn" v-on:click="flatView">
-                            <i class="material-icons left">visibility</i>
-                            flat view
-                        </a>
+        </header>
+        <!-- END: MainHeader -->
+        <!-- BEGIN: MainContent -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
+                id="file-grid">
+                <span v-if="error">
+                    Error happened.
+                </span>
+                <span v-else-if="loading">
+                    <div class="progress">
+                        <div class="indeterminate"></div>
                     </div>
-                    <div class="col s6 l2 input-field" v-if="isFlatView">
-                        <a class="waves-effect waves-light btn" v-on:click="dirView">
-                            <i class="material-icons left">folder</i>
-                            dir view
-                        </a>
-                    </div>
-                    <div class="col s6 l3 input-field download-button">
-                        <a class="waves-effect waves-light btn" :href="pageAddress + '/zipDir/' + currentDir + (isFlatView?'?flat=yes':'')">
-                            <i class="material-icons left">file_download</i>
-                            download
-                        </a>
-                    </div>
-                    <div class="input-field col s12 l7">
-                        <i class="material-icons prefix" style="color: #FFE1AF">search</i>
-                        <input type="text" id="search-input" class="search" v-model="filterValue">
-                        <label for="search-input">Search</label>
-                    </div>
-                </div>
+                </span>
+                <gallery-card-item-folder @open_item="openItem" v-bind:current_dir="currentDir +'\\'"
+                    v-bind:item="item" v-bind:key="item.id" v-bind:page_address="pageAddress"
+                    v-for="item in filteredData"></gallery-card-item-folder>
+                <gallery-card-item-image @open_item="openItem" v-bind:current_dir="currentDir +'\\'"
+                    v-bind:item="item" v-bind:key="item.id" v-bind:page_address="pageAddress"
+                    v-for="item in filteredImages"></gallery-card-item-image>
             </div>
-        </div>
-
-        <section v-if="error">
-            Error happened.
-        </section>
-        <section v-else-if="loading">
-            <div class="progress">
-                <div class="indeterminate"></div>
+        </main>
+        <!-- END: MainContent -->
+        <!-- BEGIN: Footer -->
+        <footer class="mt-auto py-8 border-t border-[#1a2121] bg-[#0f1414]">
+            <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+                <p><a href="https://github.com/marekw96/webGallery">webGallery</a> | simple webGallery page</p>
             </div>
-        </section>
-        <section v-else>
-            <div class="row">
-                <gallery-card-item-folder
-                        @open_item="openItem"
-                        v-bind:current_dir="currentDir +'\\'"
-                        v-bind:item="item"
-                        v-bind:key="item.id"
-                        v-bind:page_address="pageAddress"
-                        v-for="item in filteredData"
-                ></gallery-card-item-folder>
-            </div>
-            <div class="row">
-                <gallery-card-item-image
-                        @open_item="openItem"
-                        v-bind:current_dir="currentDir +'\\'"
-                        v-bind:item="item"
-                        v-bind:key="item.id"
-                        v-bind:page_address="pageAddress"
-                        v-for="item in filteredImages"
-                ></gallery-card-item-image>
-            </div>
-        </section>
-
-    </div>
-
+        </footer>
+    </span>
+    <!-- END: Footer -->
     <script src="%{{ url_for('static', filename='js/lightbox-plus-jquery.min.js') }}%" type="text/javascript"></script>
     <script src="%{{ url_for('static', filename='js/axios.min.js') }}%" type="text/javascript"></script>
     <script src="%{{ url_for('static', filename='js/vue.min.js') }}%" type="text/javascript"></script>
@@ -107,4 +110,5 @@
     <script src="%{{ url_for('static', filename='js/layout.js') }}%" type="text/javascript"></script>
     <script src="%{{ url_for('static', filename='js/app.js') }}%" type="text/javascript"></script>
 </body>
+
 </html>
