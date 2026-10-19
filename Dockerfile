@@ -2,7 +2,7 @@ FROM alpine:latest
 
 MAINTAINER marekw96
 
-RUN apk add --no-cache bash git python3 py3-pip zlib-dev libjpeg python3-dev jpeg-dev gcc && \
+RUN apk add --no-cache bash git python3 py3-pip zlib-dev libjpeg python3-dev jpeg-dev gcc ffmpeg && \
     apk add --no-cache --virtual .build-deps build-base linux-headers && \
     git clone https://github.com/marekw96/webGallery && \
     cd webGallery &&\

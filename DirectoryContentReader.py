@@ -17,13 +17,17 @@ class DirectoryContentReader:
     def set_flat_read(self, is_flat):
         self.read_as_flat = is_flat
 
+    VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogv', '.ogg']
+    IMAGE_EXTENSIONS = ['.jpeg', '.jpg', '.gif', '.png']
+
     def get_type(self, file_path):
         if os.path.isfile(file_path):
             extension = os.path.splitext(file_path)[1].lower()
-            if extension in ['.jpeg', '.jpg', '.gif', '.png']:
+            if extension in self.IMAGE_EXTENSIONS:
                 return DirectoryEntry.Type.image
-            else:
-                return DirectoryEntry.Type.file
+            if extension in self.VIDEO_EXTENSIONS:
+                return DirectoryEntry.Type.video
+            return DirectoryEntry.Type.file
         elif os.path.isdir(file_path):
             return DirectoryEntry.Type.directory
         else:

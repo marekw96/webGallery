@@ -14,6 +14,8 @@ Thumbnails are generated on demand and cached under `thumbnails/`. To keep that 
 
 `docker run -v path_to_dir_on_host:/webGallery/content -v path_to_thumb_cache:/webGallery/thumbnails -p 80:5000 -d webGallery`
 
+Videos (mp4, webm, ogv/ogg) are shown in the gallery with thumbnails and played in a popup. Video thumbnails require **ffmpeg** on `PATH` (included in the Docker image). For a local non-Docker run, install ffmpeg first.
+
 ### How it looks like?
 ![Main page](screen_1.png)
 

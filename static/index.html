@@ -86,14 +86,32 @@
                     </div>
                 </span>
                 <gallery-card-item-folder @open_item="openItem" v-bind:current_dir="currentDir +'\\'"
-                    v-bind:item="item" v-bind:key="item.id" v-bind:page_address="pageAddress"
+                    v-bind:item="item" v-bind:key="'f-' + item.id" v-bind:page_address="pageAddress"
                     v-for="item in filteredData"></gallery-card-item-folder>
                 <gallery-card-item-image @open_item="openItem" v-bind:current_dir="currentDir +'\\'"
-                    v-bind:item="item" v-bind:key="item.id" v-bind:page_address="pageAddress"
+                    v-bind:item="item" v-bind:key="'i-' + item.id" v-bind:page_address="pageAddress"
                     v-for="item in filteredImages"></gallery-card-item-image>
+                <gallery-card-item-video @open_video="openVideo" v-bind:current_dir="currentDir +'\\'"
+                    v-bind:item="item" v-bind:key="'v-' + item.id" v-bind:page_address="pageAddress"
+                    v-for="item in filteredVideos"></gallery-card-item-video>
             </div>
         </main>
         <!-- END: MainContent -->
+        <div v-if="activeVideo" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            v-on:click.self="closeVideo">
+            <div class="relative w-full max-w-5xl bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-2xl overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-[#2a3535]">
+                    <span class="text-sm font-medium text-slate-200 truncate pr-4" title="{{ activeVideo.name }}">{{ activeVideo.name }}</span>
+                    <button type="button" class="text-slate-400 hover:text-white transition-colors" v-on:click="closeVideo" aria-label="Close">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <video ref="videoPlayer" class="w-full max-h-[80vh] bg-black" controls autoplay
+                    :src="activeVideoUrl" :poster="activeVideoPoster"></video>
+            </div>
+        </div>
         <!-- BEGIN: Footer -->
         <footer class="mt-auto py-8 border-t border-[#1a2121] bg-[#0f1414]">
             <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">

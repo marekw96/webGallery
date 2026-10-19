@@ -6,7 +6,8 @@ class DirectoryEntry(json.JSONEncoder):
         other = 0
         file = 1
         image = 2
-        directory = 3  # must be last to make sorting be correct
+        video = 3
+        directory = 4  # must be last to make sorting be correct
 
     id = -1
     name = "No name"
@@ -21,6 +22,8 @@ class DirectoryEntry(json.JSONEncoder):
             return "directory"
         if self.type == self.Type.image:
             return "image"
+        if self.type == self.Type.video:
+            return "video"
         raise Exception("NOT FOUND")
 
     def default(self, obj):

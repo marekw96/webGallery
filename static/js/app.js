@@ -42,6 +42,25 @@ Vue.component('gallery-card-item-image', {
     `
 })
 
+Vue.component('gallery-card-item-video', {
+    props: ['item', 'current_dir', 'page_address'],
+    template: `
+<div v-if="item.type == \'video\'" v-on:click="$emit(\'open_video\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
+    <div class="aspect-square w-full overflow-hidden bg-[#2a3535] relative">
+        <img class="w-full h-full object-cover image_thumbnail" width="100%" height="100%" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>
+        <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+            <div class="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
+                <svg class="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <span class="text-xs font-medium truncate w-full px-2 py-2 text-slate-300" title="{{ item.name }}">{{ item.name }}</span>
+</div>
+    `
+})
+
 Vue.component('open-dir-tags', {
     props: ['item'],
     template: `
@@ -68,7 +87,8 @@ var app = new Vue({
         pageTitle: "webGallery",
         filterValue: "",
         isFlatView: false,
-        pageAddress: PAGE_ADDRESS
+        pageAddress: PAGE_ADDRESS,
+        activeVideo: null
     },
     computed: {
         filteredData() {
@@ -80,7 +100,7 @@ var app = new Vue({
                 });
             } else {
                 return this.galleryItemList.filter(function (d) {
-                    return d.type != "image";
+                    return d.type != "image" && d.type != "video";
                 });
             }
         },
@@ -89,16 +109,59 @@ var app = new Vue({
 
             if (this.filterValue !== undefined && this.filterValue !== '') {
                 return this.galleryItemList.filter(function (d) {
-                    return d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
+                    return d.type == "image" && d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
                 });
             } else {
                 return this.galleryItemList.filter(function (d) {
                     return d.type == "image";
                 });
             }
+        },
+        filteredVideos() {
+            var self = this;
+
+            if (this.filterValue !== undefined && this.filterValue !== '') {
+                return this.galleryItemList.filter(function (d) {
+                    return d.type == "video" && d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
+                });
+            } else {
+                return this.galleryItemList.filter(function (d) {
+                    return d.type == "video";
+                });
+            }
+        },
+        activeVideoUrl() {
+            if (!this.activeVideo) {
+                return "";
+            }
+            return this.pageAddress + "getFile" + this.currentDir + "/" + this.activeVideo.name;
+        },
+        activeVideoPoster() {
+            if (!this.activeVideo) {
+                return "";
+            }
+            return this.pageAddress + "getThumbnail" + this.currentDir + "/" + this.activeVideo.name;
         }
     },
     methods: {
+        openVideo: function (item) {
+            this.activeVideo = item;
+        },
+        closeVideo: function () {
+            var videoEl = this.$refs.videoPlayer;
+            if (videoEl) {
+                videoEl.pause();
+                videoEl.removeAttribute("src");
+                videoEl.load();
+            }
+            this.activeVideo = null;
+        },
+        onVideoKeydown: function (event) {
+            if (event.key === "Escape" && this.activeVideo) {
+                this.closeVideo();
+            }
+        },
+
         generatePathToIndex: function (index) {
             let current = "";
             for (let i = 0; i < index && i < this.openDirs.length; ++i) {
@@ -201,7 +264,11 @@ var app = new Vue({
     },
     mounted() {
         this.pageTitle = document.title;
-        this.atStart()
+        this.atStart();
+        window.addEventListener("keydown", this.onVideoKeydown);
+    },
+    beforeDestroy() {
+        window.removeEventListener("keydown", this.onVideoKeydown);
     }
 })
 
