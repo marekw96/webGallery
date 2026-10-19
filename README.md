@@ -6,9 +6,13 @@ Easiest way to run is using docker container.
 
 `docker pull marekw96/webgallery`
 
-`docker run -b path_to_dir_on_host:/webGallery/content -p 80:5000 -d webGallery`
+`docker run -v path_to_dir_on_host:/webGallery/content -p 80:5000 -d webGallery`
 
 Then it will be available on port 80 and shows _path_to_dir_on_host_
+
+Thumbnails are generated on demand and cached under `thumbnails/`. To keep that cache across container restarts, mount a second volume:
+
+`docker run -v path_to_dir_on_host:/webGallery/content -v path_to_thumb_cache:/webGallery/thumbnails -p 80:5000 -d webGallery`
 
 ### How it looks like?
 ![Main page](screen_1.png)
