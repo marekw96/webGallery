@@ -17,7 +17,7 @@ class DirectoryContentReader:
     def set_flat_read(self, is_flat):
         self.read_as_flat = is_flat
 
-    VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogv', '.ogg']
+    VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogv', '.ogg', '.mov']
     IMAGE_EXTENSIONS = ['.jpeg', '.jpg', '.gif', '.png']
 
     @staticmethod
