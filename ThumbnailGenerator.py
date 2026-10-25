@@ -39,36 +39,47 @@ class ThumbnailGenerator:
         os.makedirs(os.path.dirname(cache_path) or ".", exist_ok=True)
         temp_path = cache_path + ".tmp.jpg"
 
-        def extract_frame(seek_time):
+        def extract_frame(seek_time, fast=True):
+            cmd = ["ffmpeg", "-y"]
+            if fast:
+                cmd.extend([
+                    "-threads", "1",
+                    "-skip_frame", "nokey",
+                    "-fflags", "+fastseek",
+                ])
+            cmd.extend([
+                "-ss", seek_time,
+                "-i", source_path,
+                "-an", "-sn", "-dn",
+                "-vf", f"scale={self.MAX_SIZE}:{self.MAX_SIZE}:flags=fast_bilinear",
+                "-frames:v", "1",
+                "-update", "1",
+                "-q:v", "5",
+                temp_path,
+            ])
             return subprocess.run(
-                [
-                    "ffmpeg",
-                    "-y",
-                    "-ss", seek_time,
-                    "-i", source_path,
-                    "-frames:v", "1",
-                    "-q:v", "2",
-                    temp_path,
-                ],
+                cmd,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 check=False,
             )
 
-        result = extract_frame("1")
-        if result.returncode != 0 or not os.path.isfile(temp_path):
-            result = extract_frame("0")
+        def is_valid(path):
+            return os.path.isfile(path) and os.path.getsize(path) > 0
 
-        if result.returncode != 0 or not os.path.isfile(temp_path):
+        result = extract_frame("1", fast=True)
+        if result.returncode != 0 or not is_valid(temp_path):
+            result = extract_frame("0", fast=True)
+
+        if result.returncode != 0 or not is_valid(temp_path):
+            result = extract_frame("0", fast=False)
+
+        if result.returncode != 0 or not is_valid(temp_path):
             if os.path.isfile(temp_path):
                 os.remove(temp_path)
             raise RuntimeError("Failed to extract video thumbnail with ffmpeg")
 
-        image = Image.open(temp_path)
-        image = image.convert("RGB")
-        image = image.resize((self.MAX_SIZE, self.MAX_SIZE))
-        image.save(cache_path, "jpeg", quality=70)
-        os.remove(temp_path)
+        os.replace(temp_path, cache_path)
 
     def make_thumbnail(self, path_to_file):
         path_to_file = urllib.parse.unquote(path_to_file)
