@@ -108,24 +108,68 @@
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
                 id="file-grid">
-                <span v-if="error">
-                    Error happened.
-                </span>
-                <span v-else-if="loading">
+                <!-- Loading indicator -->
+                <div v-if="loading" class="col-span-full py-8">
                     <div class="progress">
                         <div class="indeterminate"></div>
                     </div>
-                </span>
-                <component
-                    v-for="item in displayedItems"
-                    v-bind:is="resolveItemComponent(item)"
-                    v-bind:key="item.type + '-' + item.id"
-                    v-bind:item="item"
-                    v-bind:current_dir="currentDir +'\\'"
-                    v-bind:page_address="pageAddress"
-                    @open_item="openItem"
-                    @open_video="openVideo">
-                </component>
+                </div>
+
+                <!-- Error state -->
+                <div v-else-if="error" class="col-span-full flex flex-col items-center justify-center py-20 text-center" data-purpose="error-state">
+                    <div class="w-16 h-16 mb-4 rounded-2xl bg-red-950/40 border border-red-800/40 flex items-center justify-center text-red-400 shadow-sm">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-200">Error happened</h2>
+                    <p class="text-sm text-slate-400 mt-1 max-w-sm">Failed to load directory contents.</p>
+                </div>
+
+                <!-- Empty directory state -->
+                <div v-else-if="galleryItemList.length === 0" class="col-span-full flex flex-col items-center justify-center py-20 text-center" data-purpose="empty-directory-state">
+                    <div class="w-16 h-16 mb-4 rounded-2xl bg-[#1a2121] border border-[#2a3535] flex items-center justify-center text-slate-500 shadow-sm">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-200">This directory is empty</h2>
+                    <p class="text-sm text-slate-400 mt-1 max-w-sm">There are no files or folders in this directory.</p>
+                    <button v-if="openDirs.length > 1"
+                        type="button"
+                        @click="goToDir(openDirs.length - 2)"
+                        class="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-slate-300 bg-[#1a2121] hover:bg-[#252f2f] hover:text-white rounded-lg border border-[#2a3535] transition-colors focus:outline-none">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Go back
+                    </button>
+                </div>
+
+                <!-- Empty filter state -->
+                <div v-else-if="displayedItems.length === 0" class="col-span-full flex flex-col items-center justify-center py-20 text-center" data-purpose="empty-filter-state">
+                    <div class="w-16 h-16 mb-4 rounded-2xl bg-[#1a2121] border border-[#2a3535] flex items-center justify-center text-slate-500 shadow-sm">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-200">No matching items</h2>
+                    <p class="text-sm text-slate-400 mt-1 max-w-sm">No files or folders matched your search filter.</p>
+                </div>
+
+                <!-- Grid Items -->
+                <template v-else>
+                    <component
+                        v-for="item in displayedItems"
+                        v-bind:is="resolveItemComponent(item)"
+                        v-bind:key="item.type + '-' + item.id"
+                        v-bind:item="item"
+                        v-bind:current_dir="currentDir +'\\'"
+                        v-bind:page_address="pageAddress"
+                        @open_item="openItem"
+                        @open_video="openVideo">
+                    </component>
+                </template>
             </div>
         </main>
         <!-- END: MainContent -->
