@@ -85,15 +85,16 @@
                         <div class="indeterminate"></div>
                     </div>
                 </span>
-                <gallery-card-item-folder @open_item="openItem" v-bind:current_dir="currentDir +'\\'"
-                    v-bind:item="item" v-bind:key="'f-' + item.id" v-bind:page_address="pageAddress"
-                    v-for="item in filteredData"></gallery-card-item-folder>
-                <gallery-card-item-image @open_item="openItem" v-bind:current_dir="currentDir +'\\'"
-                    v-bind:item="item" v-bind:key="'i-' + item.id" v-bind:page_address="pageAddress"
-                    v-for="item in filteredImages"></gallery-card-item-image>
-                <gallery-card-item-video @open_video="openVideo" v-bind:current_dir="currentDir +'\\'"
-                    v-bind:item="item" v-bind:key="'v-' + item.id" v-bind:page_address="pageAddress"
-                    v-for="item in filteredVideos"></gallery-card-item-video>
+                <component
+                    v-for="item in displayedItems"
+                    v-bind:is="resolveItemComponent(item)"
+                    v-bind:key="item.type + '-' + item.id"
+                    v-bind:item="item"
+                    v-bind:current_dir="currentDir +'\\'"
+                    v-bind:page_address="pageAddress"
+                    @open_item="openItem"
+                    @open_video="openVideo">
+                </component>
             </div>
         </main>
         <!-- END: MainContent -->

@@ -7,7 +7,7 @@ class DirectoryEntry(json.JSONEncoder):
         file = 1
         image = 2
         video = 3
-        directory = 4  # must be last to make sorting be correct
+        directory = 4
 
     id = -1
     name = "No name"

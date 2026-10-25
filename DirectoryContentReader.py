@@ -20,6 +20,14 @@ class DirectoryContentReader:
     VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogv', '.ogg']
     IMAGE_EXTENSIONS = ['.jpeg', '.jpg', '.gif', '.png']
 
+    @staticmethod
+    def _get_type_priority(item):
+        if item.type == DirectoryEntry.Type.directory:
+            return 0
+        if item.type in (DirectoryEntry.Type.image, DirectoryEntry.Type.video):
+            return 1
+        return 2
+
     def get_type(self, file_path):
         if os.path.isfile(file_path):
             extension = os.path.splitext(file_path)[1].lower()
@@ -42,13 +50,14 @@ class DirectoryContentReader:
             file_path = os.path.join(self.CONTENT_DIR, file)
 
             entry = DirectoryEntry()
-            entry.id = len(files)
             entry.name = file
             entry.type = self.get_type(file_path)
 
             files.append(entry)
 
-        files.sort(key=lambda item: (item.type != DirectoryEntry.Type.directory, item.name))
+        files.sort(key=lambda item: (self._get_type_priority(item), item.name.lower()))
+        for i, item in enumerate(files):
+            item.id = i
 
         return files
 
@@ -67,13 +76,14 @@ class DirectoryContentReader:
                 file_path = os.path.join(path, str(file))
 
                 entry = DirectoryEntry()
-                entry.id = len(files)
                 entry.name = os.path.join(dir_path, str(file))
                 entry.type = self.get_type(file_path)
 
                 files_out.append(entry)
 
-        files_out.sort(key=lambda item: item.name)
+        files_out.sort(key=lambda item: (self._get_type_priority(item), item.name.lower()))
+        for i, item in enumerate(files_out):
+            item.id = i
 
         return files_out
 

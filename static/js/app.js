@@ -8,7 +8,7 @@ Vue.use(VueLazyload)
 Vue.component('gallery-card-item-folder', {
     props: ['item', 'current_dir', 'page_address'],
     template: `
-<div v-if="item.type == \'directory\'" v-on:click="$emit(\'open_item\', item)" class="file-card group bg-[#1a2121] p-4 rounded-xl border border-[#2a3535] shadow-sm cursor-pointer flex flex-col items-center justify-center text-center">
+<div v-on:click="$emit(\'open_item\', item)" class="file-card group bg-[#1a2121] p-4 rounded-xl border border-[#2a3535] shadow-sm cursor-pointer flex flex-col items-center justify-center text-center">
     <div class="w-16 h-16 mb-3 text-emerald-500/80 flex items-center justify-center">
         <svg class="w-full h-full" fill="currentColor" viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path>
@@ -17,7 +17,13 @@ Vue.component('gallery-card-item-folder', {
     <span class="text-sm font-medium truncate w-full px-2 text-slate-200" title="{{ item.name }}">{{ item.name }}</span>
     <span class="text-xs text-slate-500 mt-1"></span>
 </div>
-<div v-else v-on:click="window.open(page_address + \'getFile\' + current_dir + item.name+\'?download=yes\', '_blank')" class="file-card group bg-[#1a2121] p-4 rounded-xl border border-[#2a3535] shadow-sm cursor-pointer flex flex-col items-center justify-center text-center">
+`
+})
+
+Vue.component('gallery-card-item-file', {
+    props: ['item', 'current_dir', 'page_address'],
+    template: `
+<div v-on:click="window.open(page_address + \'getFile\' + current_dir + item.name+\'?download=yes\', '_blank')" class="file-card group bg-[#1a2121] p-4 rounded-xl border border-[#2a3535] shadow-sm cursor-pointer flex flex-col items-center justify-center text-center">
     <div class="w-16 h-16 mb-3 text-emerald-500/80 flex items-center justify-center">
 <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
@@ -32,7 +38,7 @@ Vue.component('gallery-card-item-folder', {
 Vue.component('gallery-card-item-image', {
     props: ['item', 'current_dir', 'page_address'],
     template: `
-<div v-if="item.type == \'image\'" v-on:click="$emit(\'open_item\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
+<div v-on:click="$emit(\'open_item\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
     <div class="aspect-square w-full overflow-hidden bg-[#2a3535]">
         <a :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">
             <img class="w-full h-full object-cover" width="100%" height="100%" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name" class="image_thumbnail"/>
@@ -45,7 +51,7 @@ Vue.component('gallery-card-item-image', {
 Vue.component('gallery-card-item-video', {
     props: ['item', 'current_dir', 'page_address'],
     template: `
-<div v-if="item.type == \'video\'" v-on:click="$emit(\'open_video\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
+<div v-on:click="$emit(\'open_video\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
     <div class="aspect-square w-full overflow-hidden bg-[#2a3535] relative">
         <img class="w-full h-full object-cover image_thumbnail" width="100%" height="100%" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>
         <div class="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -91,12 +97,23 @@ var app = new Vue({
         activeVideo: null
     },
     computed: {
-        filteredData() {
+        displayedItems() {
             var self = this;
 
             if (this.filterValue !== undefined && this.filterValue !== '') {
                 return this.galleryItemList.filter(function (d) {
                     return d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
+                });
+            } else {
+                return this.galleryItemList;
+            }
+        },
+        filteredData() {
+            var self = this;
+
+            if (this.filterValue !== undefined && this.filterValue !== '') {
+                return this.galleryItemList.filter(function (d) {
+                    return d.type != "image" && d.type != "video" && d.name.toLocaleLowerCase().indexOf(self.filterValue.toLocaleLowerCase()) !== -1;
                 });
             } else {
                 return this.galleryItemList.filter(function (d) {
@@ -144,6 +161,18 @@ var app = new Vue({
         }
     },
     methods: {
+        resolveItemComponent: function (item) {
+            if (item.type === 'directory') {
+                return 'gallery-card-item-folder';
+            }
+            if (item.type === 'image') {
+                return 'gallery-card-item-image';
+            }
+            if (item.type === 'video') {
+                return 'gallery-card-item-video';
+            }
+            return 'gallery-card-item-file';
+        },
         openVideo: function (item) {
             this.activeVideo = item;
         },
