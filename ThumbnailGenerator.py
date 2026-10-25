@@ -9,7 +9,7 @@ class ThumbnailGenerator:
     CONTENT_DIR = "content"
     THUMBNAIL_DIR = "thumbnails"
     MAX_SIZE = 140
-    VIDEO_EXTENSIONS = {".mp4", ".webm", ".ogv", ".ogg", ".mov"}
+    VIDEO_EXTENSIONS = {".mp4", ".webm", ".ogv", ".ogg", ".mov", ".mkv"}
 
     def get_format(self, path):
         file_name, file_type = os.path.splitext(path)
