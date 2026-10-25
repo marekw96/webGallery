@@ -41,9 +41,40 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between py-4 gap-4">
                     <!-- BEGIN: Breadcrumbs -->
                     <nav aria-label="Breadcrumb" class="flex items-center text-sm font-medium text-slate-400">
-                        <ol class="flex items-center space-x-2">
-                            <open-dir-tags @go_to_dir="goToDir" style="margin-top: 10px" v-bind:item="item"
-                                v-bind:key="item.id" v-for="item in openDirs"></open-dir-tags>
+                        <ol class="flex items-center flex-wrap gap-1.5 sm:gap-2">
+                            <li v-for="(item, index) in openDirs" :key="item.id" class="inline-flex items-center">
+                                <!-- Separator (slash) for items after root -->
+                                <span v-if="index > 0" class="text-slate-600 select-none mr-1.5 sm:mr-2">/</span>
+
+                                <!-- Root element: Home icon only -->
+                                <button v-if="index === 0"
+                                    type="button"
+                                    @click="index !== openDirs.length - 1 ? goToDir(0) : null"
+                                    :class="[index === openDirs.length - 1 ? 'text-slate-200 cursor-default' : 'text-slate-400 hover:text-emerald-400 cursor-pointer', 'inline-flex items-center transition-colors focus:outline-none']"
+                                    title="Home"
+                                    aria-label="Home">
+                                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Current folder (last item) -->
+                                <span v-else-if="index === openDirs.length - 1"
+                                    class="text-slate-200 font-semibold truncate max-w-[200px] sm:max-w-xs"
+                                    aria-current="page"
+                                    :title="item.name">
+                                    {{ item.name }}
+                                </span>
+
+                                <!-- Ancestor folder link -->
+                                <button v-else
+                                    type="button"
+                                    @click="goToDir(index)"
+                                    class="hover:text-emerald-400 transition-colors cursor-pointer truncate max-w-[150px] sm:max-w-xs focus:outline-none"
+                                    :title="item.name">
+                                    {{ item.name }}
+                                </button>
+                            </li>
                         </ol>
                     </nav>
                     <!-- END: Breadcrumbs -->

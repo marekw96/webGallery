@@ -67,19 +67,6 @@ Vue.component('gallery-card-item-video', {
     `
 })
 
-Vue.component('open-dir-tags', {
-    props: ['item'],
-    template: `
-<li>
-    <a class="hover:text-emerald-400 transition-colors" v-on:click="$emit(\'go_to_dir\', item.id )">{{ item.name }}</a>
-</li>
-<li class="flex items-center space-x-2">
-    <svg class="h-5 w-5 text-[#2a3535]" fill="currentColor" viewBox="0 0 20 20">
-        <path clip-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" fill-rule="evenodd"></path>
-    </svg>
-</li>`
-})
-
 let addToHistory = true;
 
 var app = new Vue({
@@ -246,7 +233,12 @@ var app = new Vue({
 
                     this.error = false;
                     this.galleryItemList = response.data;
-                    document.title = this.pageTitle + " - " + this.openDirs[this.openDirs.length - 1].name;
+                    const currentDirItem = this.openDirs && this.openDirs.length > 0 ? this.openDirs[this.openDirs.length - 1] : null;
+                    if (currentDirItem && currentDirItem.name && currentDirItem.name !== "/") {
+                        document.title = this.pageTitle + " - " + currentDirItem.name;
+                    } else {
+                        document.title = this.pageTitle;
+                    }
                 })
                 .catch(error => {
                     console.log(error);
