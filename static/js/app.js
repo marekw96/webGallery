@@ -38,11 +38,9 @@ Vue.component('gallery-card-item-file', {
 Vue.component('gallery-card-item-image', {
     props: ['item', 'current_dir', 'page_address'],
     template: `
-<div v-on:click="$emit(\'open_item\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
+<div v-on:click="$emit(\'open_media\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
     <div class="aspect-square w-full overflow-hidden bg-[#2a3535]">
-        <a :href="page_address + \'getFile\' + current_dir + item.name" data-lightbox="roadtrip">
-            <img class="w-full h-full object-cover" width="100%" height="100%" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name" class="image_thumbnail"/>
-        </a>
+        <img class="w-full h-full object-cover image_thumbnail" width="100%" height="100%" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>
     </div>
 </div>
     `
@@ -51,7 +49,7 @@ Vue.component('gallery-card-item-image', {
 Vue.component('gallery-card-item-video', {
     props: ['item', 'current_dir', 'page_address'],
     template: `
-<div v-on:click="$emit(\'open_video\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
+<div v-on:click="$emit(\'open_media\', item)" class="file-card bg-[#1a2121] rounded-xl border border-[#2a3535] shadow-sm overflow-hidden cursor-pointer flex flex-col">
     <div class="aspect-square w-full overflow-hidden bg-[#2a3535] relative">
         <img class="w-full h-full object-cover image_thumbnail" width="100%" height="100%" v-lazy="page_address + \'getThumbnail\' + current_dir + item.name"/>
         <div class="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -81,7 +79,18 @@ var app = new Vue({
         filterValue: "",
         isFlatView: false,
         pageAddress: PAGE_ADDRESS,
-        activeVideo: null
+        activeMediaIndex: null,
+        isSlideshowActive: false,
+        slideshowTimer: null,
+        slideshowDelay: 4000,
+        isVideoMuted: (function () {
+            try {
+                var stored = localStorage.getItem('webGallery_video_muted');
+                return stored !== null ? stored === 'true' : true;
+            } catch (e) {
+                return true;
+            }
+        })()
     },
     computed: {
         displayedItems() {
@@ -94,6 +103,23 @@ var app = new Vue({
             } else {
                 return this.galleryItemList;
             }
+        },
+        mediaItems() {
+            return this.displayedItems.filter(function (d) {
+                return d.type === "image" || d.type === "video";
+            });
+        },
+        activeMedia() {
+            if (this.activeMediaIndex === null || this.activeMediaIndex < 0 || this.activeMediaIndex >= this.mediaItems.length) {
+                return null;
+            }
+            return this.mediaItems[this.activeMediaIndex];
+        },
+        formattedCurrentDir() {
+            if (!this.currentDir || this.currentDir === "/") {
+                return "/";
+            }
+            return this.currentDir.endsWith("/") ? this.currentDir : this.currentDir + "/";
         },
         filteredData() {
             var self = this;
@@ -134,17 +160,14 @@ var app = new Vue({
                 });
             }
         },
-        activeVideoUrl() {
-            if (!this.activeVideo) {
-                return "";
-            }
-            return this.pageAddress + "getFile" + this.currentDir + "/" + this.activeVideo.name;
+        activeMediaUrl() {
+            return this.getMediaUrl(this.activeMedia);
         },
-        activeVideoPoster() {
-            if (!this.activeVideo) {
-                return "";
-            }
-            return this.pageAddress + "getThumbnail" + this.currentDir + "/" + this.activeVideo.name;
+        activeMediaPoster() {
+            return this.getMediaThumbnailUrl(this.activeMedia);
+        },
+        activeMediaDownloadUrl() {
+            return this.getMediaDownloadUrl(this.activeMedia);
         }
     },
     methods: {
@@ -160,21 +183,176 @@ var app = new Vue({
             }
             return 'gallery-card-item-file';
         },
-        openVideo: function (item) {
-            this.activeVideo = item;
-        },
-        closeVideo: function () {
-            var videoEl = this.$refs.videoPlayer;
-            if (videoEl) {
-                videoEl.pause();
-                videoEl.removeAttribute("src");
-                videoEl.load();
+        getRelativeMediaItemPath: function (item) {
+            if (!item) return "";
+            if (this.isFlatView) {
+                return item.name.replace(/^\.\//, "");
             }
-            this.activeVideo = null;
+            var dir = this.currentDir;
+            if (!dir || dir === "/") {
+                return item.name;
+            }
+            dir = dir.replace(/^\/+|\/+$/g, "");
+            return dir + "/" + item.name;
         },
-        onVideoKeydown: function (event) {
-            if (event.key === "Escape" && this.activeVideo) {
-                this.closeVideo();
+        getMediaUrl: function (item) {
+            if (!item) return "";
+            var rel = this.getRelativeMediaItemPath(item);
+            return this.pageAddress + "getFile/" + encodeURI(rel);
+        },
+        getMediaThumbnailUrl: function (item) {
+            if (!item) return "";
+            var rel = this.getRelativeMediaItemPath(item);
+            return this.pageAddress + "getThumbnail/" + encodeURI(rel);
+        },
+        getMediaDownloadUrl: function (item) {
+            var url = this.getMediaUrl(item);
+            return url ? url + "?download=yes" : "";
+        },
+        openMedia: function (item) {
+            var index = this.mediaItems.findIndex(function (m) {
+                if (m.id !== undefined && item.id !== undefined) {
+                    return m.id === item.id;
+                }
+                return m.name === item.name && m.type === item.type;
+            });
+            if (index !== -1) {
+                this.stopSlideshowTimer();
+                this.isSlideshowActive = false;
+                this.activeMediaIndex = index;
+                this.syncVideoPlayback();
+            }
+        },
+        closeMedia: function () {
+            this.stopSlideshowTimer();
+            this.cleanupVideo();
+            this.isSlideshowActive = false;
+            this.activeMediaIndex = null;
+        },
+        nextMedia: function () {
+            if (this.mediaItems.length === 0) return;
+            this.stopSlideshowTimer();
+            this.cleanupVideo();
+            this.activeMediaIndex = (this.activeMediaIndex + 1) % this.mediaItems.length;
+            if (this.isSlideshowActive) {
+                this.$nextTick(this.startSlideshowStep);
+            } else {
+                this.syncVideoPlayback();
+            }
+        },
+        prevMedia: function () {
+            if (this.mediaItems.length === 0) return;
+            this.stopSlideshowTimer();
+            this.cleanupVideo();
+            this.activeMediaIndex = (this.activeMediaIndex - 1 + this.mediaItems.length) % this.mediaItems.length;
+            if (this.isSlideshowActive) {
+                this.$nextTick(this.startSlideshowStep);
+            } else {
+                this.syncVideoPlayback();
+            }
+        },
+        toggleSlideshow: function () {
+            this.isSlideshowActive = !this.isSlideshowActive;
+            if (this.isSlideshowActive) {
+                this.startSlideshowStep();
+            } else {
+                this.stopSlideshowTimer();
+            }
+        },
+        startSlideshowStep: function () {
+            this.stopSlideshowTimer();
+            if (!this.isSlideshowActive || !this.activeMedia) return;
+
+            var self = this;
+            if (this.activeMedia.type === 'image') {
+                this.slideshowTimer = setTimeout(function () {
+                    if (self.isSlideshowActive) {
+                        self.nextMedia();
+                    }
+                }, this.slideshowDelay);
+            } else if (this.activeMedia.type === 'video') {
+                this.syncVideoPlayback();
+            }
+        },
+        stopSlideshowTimer: function () {
+            if (this.slideshowTimer) {
+                clearTimeout(this.slideshowTimer);
+                this.slideshowTimer = null;
+            }
+        },
+        onVideoEnded: function () {
+            if (this.isSlideshowActive) {
+                this.nextMedia();
+            }
+        },
+        onVideoError: function () {
+            if (this.isSlideshowActive) {
+                var self = this;
+                this.slideshowTimer = setTimeout(function () {
+                    if (self.isSlideshowActive) {
+                        self.nextMedia();
+                    }
+                }, 2000);
+            }
+        },
+        onVolumeChange: function (event) {
+            var video = event.target;
+            if (video) {
+                this.isVideoMuted = video.muted;
+                try {
+                    localStorage.setItem('webGallery_video_muted', this.isVideoMuted.toString());
+                } catch (e) {}
+            }
+        },
+        syncVideoPlayback: function () {
+            var self = this;
+            this.$nextTick(function () {
+                var video = self.$refs.mediaVideo;
+                if (video) {
+                    video.muted = self.isVideoMuted;
+                    var playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(function () {
+                            if (!self.isVideoMuted) {
+                                video.muted = true;
+                                video.play().catch(function () {});
+                            }
+                        });
+                    }
+                }
+            });
+        },
+        cleanupVideo: function () {
+            var video = this.$refs.mediaVideo;
+            if (video) {
+                video.pause();
+                video.removeAttribute("src");
+                video.load();
+            }
+        },
+        onViewerKeydown: function (event) {
+            if (!this.activeMedia) return;
+            if (event.key === "Escape") {
+                this.closeMedia();
+            } else if (event.key === "ArrowRight") {
+                this.nextMedia();
+            } else if (event.key === "ArrowLeft") {
+                this.prevMedia();
+            } else if (event.key === " ") {
+                var tag = event.target && event.target.tagName;
+                if (tag !== "INPUT" && tag !== "TEXTAREA") {
+                    event.preventDefault();
+                    var video = this.$refs.mediaVideo;
+                    if (this.activeMedia.type === "video" && video) {
+                        if (video.paused) {
+                            video.play();
+                        } else {
+                            video.pause();
+                        }
+                    } else {
+                        this.toggleSlideshow();
+                    }
+                }
             }
         },
 
@@ -217,6 +395,7 @@ var app = new Vue({
             this.updatePath(dir);
         },
         fetchDirectory: function (url) {
+            this.closeMedia();
             if(url.length == 0)
                 return
 
@@ -286,10 +465,11 @@ var app = new Vue({
     mounted() {
         this.pageTitle = document.title;
         this.atStart();
-        window.addEventListener("keydown", this.onVideoKeydown);
+        window.addEventListener("keydown", this.onViewerKeydown);
     },
     beforeDestroy() {
-        window.removeEventListener("keydown", this.onVideoKeydown);
+        window.removeEventListener("keydown", this.onViewerKeydown);
+        this.stopSlideshowTimer();
     }
 })
 
